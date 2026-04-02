@@ -1,0 +1,73 @@
+client:
+
+ip route del 192.168.0.0/24 via 172.19.20.226 dev eth0
+
+
+left 10.0 untouched, although could be removed.
+
+
+
+ip6tables -F
+ip6tables -A OUTPUT -p tcp --dport 8080 -d fdaa:10:e940:a7b::/64 -j DROP
+
+
+could the ipv6 addr above be more specific
+since default policy is ACCEPT
+
+
+
+vim /etc/wireguard/wg0.conf
+cat /etc/wireguard/wg0.conf
+
+
+
+wg conf changes
+mtu 1800 to 1340
+Endpoint = [fdaa:10:e940:a7b:177:2657:5181:2]:51820
+addr 
+10 to 192
+and allowed too 10 to 192
+
+
+wg-quick down wg0
+wg-quick up wg0
+
+find / -name test-connection.sh
+/usr/local/bin/test-connection.sh
+
+
+server:
+
+ip6tables -F
+iptables -F
+sysctl -w net.ipv4.icmp_echo_ignore_all=0 
+ip a for finding server addr ,can be also found in dashboard or ****ctl etc.
+
+wg conf changes
+mtu 1280 to 1340 could just be left at 1280
+
+
+
+optional
+test mtu frag
+
+
+dd if=/dev/zero of=./big.html bs=2K count=1
+curl -o /dev/null http://192.168.0.1:8080
+
+tcpdump -i eth0 -n 'ip6[6] = 44' // only frags
+tcpdump -i eth0 -n -v ip6 and greater 900 // all
+
+client;
+netstat -s | grep -i frag
+
+
+
+
+
+
+tcpdump -i eth0 -n -v ip6 and greater 900 // output of
+06:19:51.428286 IP6 (hlim 62, next-header Fragment (44) payload length: 1376) fdaa:10:e940:a7b:177:2657:5181:2 > fdaa:10:e940:a7b:178:e357:d961:2: frag (0x2868ac1d:0|1368) 51820 > 51820: UDP, bad length 1373 > 1360
+06:19:51.428287 IP6 (hlim 62, next-header UDP (17) payload length: 856) fdaa:10:e940:a7b:177:2657:5181:2.51820 > fdaa:10:e940:a7b:178:e357:d961:2.51820: [udp sum ok] UDP, length 848
+06:20:19.771709 IP6 (hlim 62, next-header UDP (17) payload length: 1380) fdaa:10:e940:a7b:177:2657:5181:2.51820 > fdaa:10:e940:a7b:178:e357:d961:2.51820: [udp sum ok] UDP, length 1372
+06:20:19.771709 IP6 (hlim 62, next-header UDP (17) payload length: 856) fdaa:10:e940:a7b:177:2657:5181:2.51820 > fdaa:10:e940:a7b:178:e357:d961:2.51820: [udp sum ok] UDP, length 848

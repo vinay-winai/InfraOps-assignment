@@ -1,0 +1,265 @@
+root@32876262f07685:/media# /usr/local/bin/test-storage.sh
+# Ensuring we can write to the data dir...
+PASS: Successfully wrote to the data dir.
+
+# Verifying there are 4 PVs in the vg0 VG...
+PASS: Detected 4 PVs
+
+# Verifying that the vg0 VG is built from 4 1.8G PVs
+PASS: All PVs are correctly sized.
+
+# Checking that the data0 volume is 4G...
+PASS: The data0 LV is 4096 MiB.
+
+# Ensuring we don't have any corrupted objects...
+PASS: Data in /data/objects checksums correctly.
+
+# Simulating object creation to trigger disk growth...
+100M file created: /data/test/1 ( 18% disk used)
+100M file created: /data/test/2 ( 21% disk used)
+100M file created: /data/test/3 ( 23% disk used)
+100M file created: /data/test/4 ( 26% disk used)
+100M file created: /data/test/5 ( 28% disk used)
+100M file created: /data/test/6 ( 31% disk used)
+100M file created: /data/test/7 ( 34% disk used)
+100M file created: /data/test/8 ( 36% disk used)
+100M file created: /data/test/9 ( 39% disk used)
+100M file created: /data/test/10 ( 41% disk used)
+100M file created: /data/test/11 ( 44% disk used)
+100M file created: /data/test/12 ( 46% disk used)
+100M file created: /data/test/13 ( 49% disk used)
+100M file created: /data/test/14 ( 51% disk used)
+100M file created: /data/test/15 ( 54% disk used)
+100M file created: /data/test/16 ( 56% disk used)
+100M file created: /data/test/17 ( 59% disk used)
+100M file created: /data/test/18 ( 61% disk used)
+100M file created: /data/test/19 ( 64% disk used)
+100M file created: /data/test/20 ( 66% disk used)
+100M file created: /data/test/21 ( 69% disk used)
+100M file created: /data/test/22 ( 71% disk used)
+100M file created: /data/test/23 ( 74% disk used)
+100M file created: /data/test/24 ( 76% disk used)
+100M file created: /data/test/25 ( 79% disk used)
+100M file created: /data/test/26 ( 82% disk used)
+100M file created: /data/test/27 ( 84% disk used)
+100M file created: /data/test/28 ( 87% disk used)
+  Size of logical volume vg0/data0 changed from 4.00 GiB (1024 extents) to <4.49 GiB (1149 extents).
+  Logical volume vg0/data0 successfully resized.
+resize2fs 1.45.5 (07-Jan-2020)
+Filesystem at /dev/vg0/data0 is mounted on /data; on-line resizing required
+old_desc_blocks = 1, new_desc_blocks = 1
+The filesystem on /dev/vg0/data0 is now 1176576 (4k) blocks long.
+
+100M file created: /data/test/29 ( 79% disk used)
+100M file created: /data/test/30 ( 82% disk used)
+100M file created: /data/test/31 ( 84% disk used)
+100M file created: /data/test/32 ( 86% disk used)
+  Size of logical volume vg0/data0 changed from <4.49 GiB (1149 extents) to <4.98 GiB (1274 extents).
+  Logical volume vg0/data0 successfully resized.
+resize2fs 1.45.5 (07-Jan-2020)
+Filesystem at /dev/vg0/data0 is mounted on /data; on-line resizing required
+old_desc_blocks = 1, new_desc_blocks = 1
+The filesystem on /dev/vg0/data0 is now 1304576 (4k) blocks long.
+
+100M file created: /data/test/33 ( 79% disk used)
+100M file created: /data/test/34 ( 81% disk used)
+100M file created: /data/test/35 ( 84% disk used)
+100M file created: /data/test/36 ( 86% disk used)
+100M file created: /data/test/37 ( 88% disk used)
+  Size of logical volume vg0/data0 changed from <4.98 GiB (1274 extents) to 5.46 GiB (1399 extents).
+  Logical volume vg0/data0 successfully resized.
+resize2fs 1.45.5 (07-Jan-2020)
+Filesystem at /dev/vg0/data0 is mounted on /data; on-line resizing required
+old_desc_blocks = 1, new_desc_blocks = 1
+The filesystem on /dev/vg0/data0 is now 1432576 (4k) blocks long.
+
+100M file created: /data/test/38 ( 81% disk used)
+100M file created: /data/test/39 ( 83% disk used)
+100M file created: /data/test/40 ( 85% disk used)
+100M file created: /data/test/41 ( 87% disk used)
+  Size of logical volume vg0/data0 changed from 5.46 GiB (1399 extents) to 5.95 GiB (1524 extents).
+  Logical volume vg0/data0 successfully resized.
+resize2fs 1.45.5 (07-Jan-2020)
+Filesystem at /dev/vg0/data0 is mounted on /data; on-line resizing required
+old_desc_blocks = 1, new_desc_blocks = 1
+The filesystem on /dev/vg0/data0 is now 1560576 (4k) blocks long.
+
+100M file created: /data/test/42 ( 81% disk used)
+100M file created: /data/test/43 ( 83% disk used)
+100M file created: /data/test/44 ( 85% disk used)
+100M file created: /data/test/45 ( 87% disk used)
+  Size of logical volume vg0/data0 changed from 5.95 GiB (1524 extents) to 6.44 GiB (1649 extents).
+  Logical volume vg0/data0 successfully resized.
+resize2fs 1.45.5 (07-Jan-2020)
+Filesystem at /dev/vg0/data0 is mounted on /data; on-line resizing required
+old_desc_blocks = 1, new_desc_blocks = 1
+The filesystem on /dev/vg0/data0 is now 1688576 (4k) blocks long.
+
+100M file created: /data/test/46 ( 81% disk used)
+100M file created: /data/test/47 ( 83% disk used)
+100M file created: /data/test/48 ( 85% disk used)
+100M file created: /data/test/49 ( 86% disk used)
+  Size of logical volume vg0/data0 changed from 6.44 GiB (1649 extents) to <6.93 GiB (1774 extents).
+  Logical volume vg0/data0 successfully resized.
+resize2fs 1.45.5 (07-Jan-2020)
+Filesystem at /dev/vg0/data0 is mounted on /data; on-line resizing required
+old_desc_blocks = 1, new_desc_blocks = 1
+The filesystem on /dev/vg0/data0 is now 1816576 (4k) blocks long.
+
+100M file created: /data/test/50 ( 81% disk used)
+100M file created: /data/test/51 ( 83% disk used)
+100M file created: /data/test/52 ( 84% disk used)
+100M file created: /data/test/53 ( 86% disk used)
+100M file created: /data/test/54 ( 87% disk used)
+  Insufficient free space: 125 extents needed, but only 22 available
+resize2fs 1.45.5 (07-Jan-2020)
+The filesystem is already 1816576 (4k) blocks long.  Nothing to do!
+
+100M file created: /data/test/55 ( 89% disk used)
+  Insufficient free space: 125 extents needed, but only 22 available
+resize2fs 1.45.5 (07-Jan-2020)
+The filesystem is already 1816576 (4k) blocks long.  Nothing to do!
+
+100M file created: /data/test/56 ( 90% disk used)
+  Insufficient free space: 125 extents needed, but only 22 available
+resize2fs 1.45.5 (07-Jan-2020)
+The filesystem is already 1816576 (4k) blocks long.  Nothing to do!
+
+100M file created: /data/test/57 ( 92% disk used)
+  Insufficient free space: 125 extents needed, but only 22 available
+resize2fs 1.45.5 (07-Jan-2020)
+The filesystem is already 1816576 (4k) blocks long.  Nothing to do!
+
+100M file created: /data/test/58 ( 93% disk used)
+  Insufficient free space: 125 extents needed, but only 22 available
+resize2fs 1.45.5 (07-Jan-2020)
+The filesystem is already 1816576 (4k) blocks long.  Nothing to do!
+
+100M file created: /data/test/59 ( 94% disk used)
+  Insufficient free space: 125 extents needed, but only 22 available
+resize2fs 1.45.5 (07-Jan-2020)
+The filesystem is already 1816576 (4k) blocks long.  Nothing to do!
+
+100M file created: /data/test/60 ( 96% disk used)
+  Insufficient free space: 125 extents needed, but only 22 available
+resize2fs 1.45.5 (07-Jan-2020)
+The filesystem is already 1816576 (4k) blocks long.  Nothing to do!
+
+100M file created: /data/test/61 ( 97% disk used)
+  Insufficient free space: 125 extents needed, but only 22 available
+resize2fs 1.45.5 (07-Jan-2020)
+The filesystem is already 1816576 (4k) blocks long.  Nothing to do!
+
+100M file created: /data/test/62 ( 99% disk used)
+  Insufficient free space: 125 extents needed, but only 22 available
+resize2fs 1.45.5 (07-Jan-2020)
+The filesystem is already 1816576 (4k) blocks long.  Nothing to do!
+
+
+# Checking that the /data filesystem is at least 6G now...
+PASS: /data is at least 6G
+
+## LVM Summary
+  --- Physical volume ---
+  PV Name               /dev/loop0
+  VG Name               vg0
+  PV Size               <1.76 GiB / not usable 4.00 MiB
+  Allocatable           NO
+  PE Size               4.00 MiB
+  Total PE              449
+  Free PE               0
+  Allocated PE          449
+  PV UUID               W0Yo4Q-2quT-BjfN-vGYI-GjlE-W0si-KpOda1
+   
+  --- Physical volume ---
+  PV Name               /dev/loop2
+  VG Name               vg0
+  PV Size               <1.76 GiB / not usable 3.00 MiB
+  Allocatable           yes (but full)
+  PE Size               4.00 MiB
+  Total PE              449
+  Free PE               0
+  Allocated PE          449
+  PV UUID               uhD6eG-D2Cy-yLyI-6iDl-aHsu-vuXz-GG04vf
+   
+  --- Physical volume ---
+  PV Name               /dev/loop1
+  VG Name               vg0
+  PV Size               <1.76 GiB / not usable 4.00 MiB
+  Allocatable           yes (but full)
+  PE Size               4.00 MiB
+  Total PE              449
+  Free PE               0
+  Allocated PE          449
+  PV UUID               uMT0al-gO2H-lwXD-GVEa-S4nw-1hIX-XEwMZy
+   
+  --- Physical volume ---
+  PV Name               /dev/loop3
+  VG Name               vg0
+  PV Size               <1.76 GiB / not usable 4.00 MiB
+  Allocatable           yes 
+  PE Size               4.00 MiB
+  Total PE              449
+  Free PE               22
+  Allocated PE          427
+  PV UUID               k0h7q9-8j46-09I5-oQ1x-gyRC-Xm0Q-N0z2AK
+   
+  --- Volume group ---
+  VG Name               vg0
+  System ID             
+  Format                lvm2
+  Metadata Areas        4
+  Metadata Sequence No  17
+  VG Access             read/write
+  VG Status             resizable
+  MAX LV                0
+  Cur LV                1
+  Open LV               1
+  Max PV                0
+  Cur PV                4
+  Act PV                4
+  VG Size               <7.02 GiB
+  PE Size               4.00 MiB
+  Total PE              1796
+  Alloc PE / Size       1774 / <6.93 GiB
+  Free  PE / Size       22 / 88.00 MiB
+  VG UUID               NvdzDw-MghQ-4pl0-t1u4-XgxW-fOO6-ucTRta
+   
+  --- Logical volume ---
+  LV Path                /dev/vg0/data0
+  LV Name                data0
+  VG Name                vg0
+  LV UUID                2Ol2ar-eey7-F4sR-Vcjo-CUxI-11Bb-3N71la
+  LV Write Access        read/write
+  LV Creation host, time 32876262f07685, 2025-05-27 13:24:24 +0000
+  LV Status              available
+  # open                 1
+  LV Size                <6.93 GiB
+  Current LE             1774
+  Segments               4
+  Allocation             inherit
+  Read ahead sectors     auto
+  - currently set to     256
+  Block device           252:0
+   
+  --- Segments ---
+  Logical extents 0 to 448:
+    Type		linear
+    Physical volume	/dev/loop0
+    Physical extents	0 to 448
+   
+  Logical extents 449 to 897:
+    Type		linear
+    Physical volume	/dev/loop2
+    Physical extents	0 to 448
+   
+  Logical extents 898 to 1346:
+    Type		linear
+    Physical volume	/dev/loop1
+    Physical extents	0 to 448
+   
+  Logical extents 1347 to 1773:
+    Type		linear
+    Physical volume	/dev/loop3
+    Physical extents	0 to 426
+   

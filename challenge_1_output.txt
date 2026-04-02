@@ -1,0 +1,33 @@
+root@d8d9e12a3d5248:/# /usr/local/bin/test-connection.sh
+
+Resetting wireguard interface
+[#] ip link delete dev wg0
+[#] ip link add wg0 type wireguard
+[#] wg setconf wg0 /dev/fd/63
+[#] ip -4 address add 192.168.0.2/24 dev wg0
+[#] ip link set mtu 1280 up dev wg0
+
+
+curl -qs --connect-timeout 1 -o /dev/null "http://[fdaa:10:e940:a7b:177:2657:5181:2]:8080"
+* [PASS] Failed to connect to remote over 6pn
+
+Attempting to ping remote wireguard ip 192.168.0.1
+PING 192.168.0.1 (192.168.0.1) 56(84) bytes of data.
+64 bytes from 192.168.0.1: icmp_seq=1 ttl=64 time=43.9 ms
+64 bytes from 192.168.0.1: icmp_seq=2 ttl=64 time=0.842 ms
+64 bytes from 192.168.0.1: icmp_seq=3 ttl=64 time=0.815 ms
+64 bytes from 192.168.0.1: icmp_seq=4 ttl=64 time=1.00 ms
+64 bytes from 192.168.0.1: icmp_seq=5 ttl=64 time=1.27 ms
+
+--- 192.168.0.1 ping statistics ---
+5 packets transmitted, 5 received, 0% packet loss, time 4036ms
+rtt min/avg/max/mdev = 0.815/9.563/43.888/17.163 ms
+* [PASS] Could ping wireguard
+
+
+curl --connect-timeout 1 "http://192.168.0.1:8080"
+Hello!
+
+This is the **** SRE network work sample test file. This should be accessible over the wireguard network configured between the two work sample apps and not directly over the 6pm private network (fdaa::). 
+
+* [PASS] Connected to remote over wireguard

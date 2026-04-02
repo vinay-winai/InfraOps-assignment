@@ -1,0 +1,246 @@
+Network Debugging
+
+
+find and ran test-conn.sh
+Connected to remote over 6pn (should be blocked)
+can be blocked by adding filtering rule
+ip6tables -A OUTPUT -p tcp --dport 8080 -d fdaa:10:e940:a7b::/64 -j DROP                       \
+test has passed
+
+ping Destination Host Unreachable
+ipv6 http works
+ipv4 over wg blocked
+curl 192.168 no route to host
+so routing issue plus misconfigured wg
+
+wg changed pri address of client to match with server,  since test-conn script has 192.168 as server addr        \
+changing ip addr is a simple fix
+simple routing , no forwarding required 
+allowed ip changed accordingly                                                      \
+mtu checked with ip a 1420 for eth0                                   
+1500 - 80 **** also uses wg
+optimal is 1340 then.
+for now ch client to 1280 can verity 1340 later                                     \
+also added endpoint on client side.                                                 \
+ipv6 addr of server found with ip a
+
+on client
+wg-quick down wg0
+wg-quick up wg0
+
+now routing, no routing issues on server vm
+on client conflicting routes
+192.168.0.0/24 via 172.19.20.226 dev eth0                                  
+192.168.0.0/24 dev wg0 proto kernel scope link src 192.168.0.2
+so deleted eth0 route                                                                 \
+could also remove 10.0.0.0/24 via 172.19.20.226 dev eth0
+
+
+now wg show indicates packets are send by client, but server has not received
+
+so are packets are getting filtered out?
+
+yes confirmed on server vm
+ip6tables -L -v -n
+Chain INPUT (policy ACCEPT 1149 packets, 98893 bytes)
+ pkts bytes target     prot opt in     out     source               destination         
+   26  5096 DROP       udp      *      *       ::/0                 ::/0                 udp dpt:51820
+
+so removed it with ip6tables -F                                                                                 \
+no need to add specific accept rule since default policy for all chains is ACCEPT
+
+also these changes are not expected to be persistent since rootfs is ephemeral, to do so need something like startup script , **** volume etc, out of challenge scope
+
+
+now server successfully sends and receives but client cant receive
+same issue the udp filtering rule                                               \
+
+now wire guard is successful
+both vm sending and receiving but ping and curl still failed
+
+some how 
+udp working but icmp and tcp don't                                   
+sanity check ping 8.8.8.8 worked
+which means issue only with server vm checked sysctl
+issue confirmed ignore echo was true i.e, 1 changed to zero.
+sysctl -w net.ipv4.icmp_echo_ignore_all=0                                                   \
+
+now why is tcp being blocked over wg
+
+lets check any issues with python server 
+ss -tuln
+tcp     LISTEN   0        0                                           *:8080                 *:* 
+netstat -tulnp
+tcp6       0      0 :::8080                 :::*                    LISTEN      628/python3
+dual stack socket
+curl -g "http://[::1]:8080"
+curl "http://127.0.0.1:8080"
+the above worked on server vm so no issues with server. for tcp and tcp6
+
+so tcp packets must be blocked
+
+curl http://192.168.0.1:8080 in server vm works fine
+
+
+root@784e675f110d58:/usr/share/****lo-world# iptables -L -v -n
+Chain INPUT (policy ACCEPT 34 packets, 10032 bytes)
+ pkts bytes target     prot opt in     out     source               destination         
+   18  1080 DROP       tcp  --  wg0    *       0.0.0.0/0            0.0.0.0/0            tcp dpt:8080
+-A INPUT -i wg0 -p tcp -m tcp --dport 8080 -j DROP
+
+after iptables -F                                                                        \
+issue resolved
+
+optionally mtu frag,
+
+dd if=/dev/zero of=./big_file.html bs=2K count=1
+curl -o /dev/null http://192.168.0.1:8080/big_file.html
+
+tcpdump -i eth0 -n 'ip6[6] = 44' // only frags
+
+
+ip link set wg0 mtu 1341 and above
+root@d8d9e12a3d5248:/# tcpdump -i eth0 -n 'ip6[6] = 44'
+tcpdump: verbose output suppressed, use -v or -vv for full protocol decode
+listening on eth0, link-type EN10MB (Ethernet), capture size 262144 bytes
+11:05:26.498398 IP6 fdaa:10:e940:a7b:177:2657:5181:2 > fdaa:10:e940:a7b:178:e357:d961:2: frag (0|1368) 51820 > 51820: UDP, bad length 1373 > 1360
+11:05:26.498398 IP6 fdaa:10:e940:a7b:177:2657:5181:2 > fdaa:10:e940:a7b:178:e357:d961:2: frag (1368|13)
+
+
+root@d8d9e12a3d5248:/# tcpdump -i eth0 -n 'ip6[6] = 44'
+tcpdump: verbose output suppressed, use -v or -vv for full protocol decode
+listening on eth0, link-type EN10MB (Ethernet), capture size 262144 bytes
+10:49:24.170923 IP6 fdaa:10:e940:a7b:177:2657:5181:2 > fdaa:10:e940:a7b:178:e357:d961:2: frag (0|1368) 51820 > 51820: UDP, bad length 1432 > 1360
+10:49:24.170923 IP6 fdaa:10:e940:a7b:177:2657:5181:2 > fdaa:10:e940:a7b:178:e357:d961:2: frag (1368|72)
+
+
+WireGuard Overhead = 80 bytes (40 IPv6 + 8 UDP + 32 WireGuard)
+
+server ip link set wg0 mtu 1340 or lower
+no frag
+
+so I have set wg mtu on both as 1340 for optimal performance
+
+
+also verified with iperf and better perf consistently with 1340 and immediate drop with 1341
+
+
+
+
+
+
+
+
+
+Storage Debugging
+
+
+dmesg
+/data is changed to read only
+[    0.862131] EXT4-fs (vda): mounted filesystem 2013c12f-4f3d-467f-8fe7-82e2d6c0c150 ro with ordered data mode. Quota mode: none.
+[    0.863016] EXT4-fs (vdb): barriers disabled
+[    0.863338] EXT4-fs (vdb): mounted filesystem c9658d65-f5cb-46c5-81c5-c6f27355c5bd r/w with ordered data mode. Quota mode: none.
+[    1.085909] loop0: detected capacity change from 0 to 3686400
+[    1.099202] loop1: detected capacity change from 0 to 3686400
+[    1.115252] loop2: detected capacity change from 0 to 3686400
+[    1.707593] EXT4-fs (dm-0): mounted filesystem fb6d6dc5-2627-4153-ba9d-d0c56a014835 r/w with ordered data mode. Quota mode: none.
+[   48.823899] EXT4-fs (dm-0): re-mounted fb6d6dc5-2627-4153-ba9d-d0c56a014835 ro. Quota mode: none.
+
+also verified with mount | grep /data
+and cat /etc/fstab
+
+fixed /data to rw
+mount -o remount,rw /data
+
+
+fixed loop disk pv issues
+
+pvresize /dev/loop2
+
+pvmove /dev/loop1 /dev/loop2
+vgreduce vg0 /dev/loop1
+pvremove /dev/loop1
+pvcreate /dev/loop1
+vgextend vg0 /dev/loop1
+ 
+
+4th img fallocate failed with no space
+removed it
+no space in rootfs
+cloned machine with 2G of **** volume attached mounted at /exmedia
+**** machines run ****io/infra-storage-challenge:latest -a infra-storage-343 --volume v0:exmedia
+created 4th img on it 
+it works
+
+could it be done without extra physical storage i.e no **** volumes?
+inspected /data/test with filefrag etc
+found they are only fallocated ie consuming extends but no data being written , extends are flagged written as seen 
+with filefrag 
+so theoretically i could have as much disk space as wanted if img file in rootfs is created with a sparce file via truncate etc.
+
+truncate -s 1800M /media/disk3.img
+losetup /dev/loop3 /media/disk3.img
+pvcreate /dev/loop3
+vgextend vg0 /dev/loop3
+
+fs in /data wouldn't know so challenge possible.
+
+
+next steps,
+
+
+lvextend -L 4G /dev/vg0/data0
+resize2fs /dev/vg0/data0
+
+vim /usr/local/bin/auto-expand.sh
+
+
+#!/bin/bash
+
+EXPAND_AMOUNT_MIB=500
+
+while true; do
+    USAGE=$(df /data | awk 'NR==2 {gsub(/%/, "", $5); print $5}')
+    VG_FREE_MIB=$(vgs -o vg_free --units m --noheadings --nosuffix vg0 | cut -d'.' -f1)
+
+    if [ "$USAGE" -gt 90 ]; then
+        if [ "$VG_FREE_MIB" -ge "$EXPAND_AMOUNT_MIB" ]; then
+            lvextend -L +"${EXPAND_AMOUNT_MIB}M" /dev/vg0/data0
+            resize2fs /dev/vg0/data0
+            echo "Expanded /data by ${EXPAND_AMOUNT_MIB}M. Free space in VG: ${VG_FREE_MIB}MiB."
+        else
+            echo "WARNING: Insufficient space ($VG_FREE_MIB MiB free). ${EXPAND_AMOUNT_MIB}M required for expansion."
+        fi
+    fi
+    
+    sleep 2
+done 
+
+
+can we remove nested if
+yes
+
+
+
+
+
+
+
+
+chmod +x /usr/local/bin/auto-expand.sh
+/usr/local/bin/auto-expand.sh &
+
+
+all these ops are online so no downtime for http object service plus could it be verified with watch curl ?
+no it is better to curl httpstatus script and save log/grep
+
+also these changes are not expected to be persistent since rootfs is ephemeral, to do so need something like startup script , **** volume etc, out of challenge scope
+
+
+/usr/local/bin/test-storage.sh
+
+
+about thinprov , lvm conf, system conf systemctl
+
+
+
